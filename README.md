@@ -33,6 +33,16 @@ A full-stack web application designed for **Electronic Visit Verification (EVV)*
 - **Primary Method**: Browser Geolocation API.
 - **Fallback Handling**: If GPS is unavailable (permission denied or device failure), caregivers are prompted to proceed anyway. The entry will be accepted but permanently flagged as **"Unverified" ⚠️** for administrative audit. This ensures caregivers aren't completely blocked in signal-dead zones.
 
+## Live Environment
+
+The application is deployed and available at the following locations:
+
+- **Frontend**: [https://bht-frontend-production.up.railway.app/](https://bht-frontend-production.up.railway.app/)
+- **Backend API**: [https://bht-backend-production.up.railway.app/](https://bht-backend-production.up.railway.app/)
+- **API Documentation (Swagger)**: [https://bht-backend-production.up.railway.app/docs/index.html](https://bht-backend-production.up.railway.app/docs/index.html)
+
+---
+
 ## Quick Start (Docker - Recommended)
 
 You can spin up the entire application using Docker Compose with zero manual configuration.

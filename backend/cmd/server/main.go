@@ -69,8 +69,8 @@ func main() {
 	// Setup router
 	router := routes.NewRouter(scheduleController, taskController)
 
-	// Start server
-	addr := fmt.Sprintf(":%s", cfg.ServerPort)
+	// Start server on all interfaces (required for Railway/Docker)
+	addr := fmt.Sprintf("0.0.0.0:%s", cfg.ServerPort)
 	slog.Info("Server started", slog.String("addr", addr))
 	if err := router.Run(addr); err != nil {
 		slog.Error("Failed to start server", slog.Any("error", err))
