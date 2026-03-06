@@ -2,8 +2,6 @@
 
 A full-stack web application designed for **Electronic Visit Verification (EVV)** compliance. Caregivers can view their schedules, clock in/out with real-time geolocation, and track daily care activity progress seamlessly.
 
-👉 **[View Deployment Guide](./deployment_guide.md)** for instructions on how to host this project publicly.
-
 ## Project Structure
 - `frontend/` - React 19 SPA powered by Vite and TypeScript. [Frontend README](./frontend/README.md)
 - `backend/` - Go REST API powered by Gin and PostgreSQL. [Backend README](./backend/README.md)
