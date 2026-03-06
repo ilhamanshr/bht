@@ -1,12 +1,11 @@
-services:
-  # 1. PostgreSQL Database
-  - type: database
-    name: bht-db
+databases:
+  - name: bht-db
     databaseName: evv_logger
     user: postgres
     plan: free
 
-  # 2. Go Backend API
+services:
+  # 1. Go Backend API
   - type: web
     name: bht-backend
     env: docker
@@ -39,7 +38,7 @@ services:
       - key: SERVER_PORT
         value: 8080
 
-  # 3. React Frontend (Serving via our Nginx Dockerfile)
+  # 2. React Frontend (Serving via our Nginx Dockerfile)
   - type: web
     name: bht-frontend
     env: docker
