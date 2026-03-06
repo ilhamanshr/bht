@@ -1,0 +1,471 @@
+basePath: /api
+definitions:
+  bht-test_internal_domain.ClockInRequest:
+    properties:
+      latitude:
+        maximum: 90
+        minimum: -90
+        type: number
+      longitude:
+        maximum: 180
+        minimum: -180
+        type: number
+    type: object
+  bht-test_internal_domain.ClockOutRequest:
+    properties:
+      latitude:
+        maximum: 90
+        minimum: -90
+        type: number
+      longitude:
+        maximum: 180
+        minimum: -180
+        type: number
+    type: object
+  bht-test_internal_domain.CreateScheduleRequest:
+    properties:
+      client_name:
+        example: John Doe
+        type: string
+      end_at:
+        example: "2026-03-06T18:00:00+09:00"
+        type: string
+      latitude:
+        example: 35.6895
+        maximum: 90
+        minimum: -90
+        type: number
+      location:
+        example: Tokyo Branch
+        type: string
+      longitude:
+        example: 139.6917
+        maximum: 180
+        minimum: -180
+        type: number
+      start_at:
+        example: "2026-03-06T10:00:00+09:00"
+        type: string
+      tasks:
+        items:
+          $ref: '#/definitions/bht-test_internal_domain.CreateTaskRequest'
+        type: array
+    required:
+    - client_name
+    - end_at
+    - latitude
+    - location
+    - longitude
+    - start_at
+    type: object
+  bht-test_internal_domain.CreateTaskRequest:
+    properties:
+      schedule_id:
+        type: integer
+      title:
+        type: string
+    required:
+    - schedule_id
+    - title
+    type: object
+  bht-test_internal_domain.ErrorResponse:
+    properties:
+      error:
+        example: error message
+        type: string
+      success:
+        example: false
+        type: boolean
+    type: object
+  bht-test_internal_domain.Response:
+    properties:
+      data: {}
+      success:
+        example: true
+        type: boolean
+    type: object
+  bht-test_internal_domain.Schedule:
+    properties:
+      client_name:
+        type: string
+      clock_in_at:
+        type: string
+      clock_in_lat:
+        type: number
+      clock_in_lng:
+        type: number
+      clock_in_verified:
+        type: boolean
+      clock_out_at:
+        type: string
+      clock_out_lat:
+        type: number
+      clock_out_lng:
+        type: number
+      clock_out_verified:
+        type: boolean
+      created_at:
+        type: string
+      end_at:
+        type: string
+      id:
+        type: integer
+      latitude:
+        type: number
+      location:
+        type: string
+      longitude:
+        type: number
+      start_at:
+        type: string
+      status:
+        type: string
+      tasks:
+        items:
+          $ref: '#/definitions/bht-test_internal_domain.Task'
+        type: array
+      updated_at:
+        type: string
+    type: object
+  bht-test_internal_domain.ScheduleStats:
+    properties:
+      completed:
+        type: integer
+      missed:
+        type: integer
+      total:
+        type: integer
+      upcoming:
+        type: integer
+    type: object
+  bht-test_internal_domain.Task:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      reason:
+        type: string
+      schedule_id:
+        type: integer
+      status:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  bht-test_internal_domain.UpdateTaskRequest:
+    properties:
+      reason:
+        type: string
+      status:
+        enum:
+        - completed
+        - not_completed
+        type: string
+    required:
+    - status
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: hr@bluehorntek.com
+    name: Blue Horn Tech
+  description: |-
+    Caregiver Shift Tracker API for Electronic Visit Verification (EVV) compliance.
+    Caregivers can view schedules, clock in/out with geolocation, and track care activity progress.
+  title: Mini EVV Logger API
+  version: "1.0"
+paths:
+  /schedules:
+    get:
+      description: Get a list of all caregiver schedules ordered by date
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/bht-test_internal_domain.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/bht-test_internal_domain.Schedule'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/bht-test_internal_domain.ErrorResponse'
+      summary: List all schedules
+      tags:
+      - schedules
+    post:
+      consumes:
+      - application/json
+      description: Create a new schedule along with its associated tasks
+      parameters:
+      - description: Schedule and tasks details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/bht-test_internal_domain.CreateScheduleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/bht-test_internal_domain.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/bht-test_internal_domain.Schedule'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bht-test_internal_domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/bht-test_internal_domain.ErrorResponse'
+      summary: Create a new schedule
+      tags:
+      - schedules
+  /schedules/{id}:
+    get:
+      description: Get a single schedule with its associated care tasks
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/bht-test_internal_domain.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/bht-test_internal_domain.Schedule'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bht-test_internal_domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/bht-test_internal_domain.ErrorResponse'
+      summary: Get schedule by ID
+      tags:
+      - schedules
+  /schedules/{id}/clock-in:
+    post:
+      consumes:
+      - application/json
+      description: Start a visit by recording timestamp and geolocation. Schedule
+        must be in 'upcoming' status.
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Geolocation coordinates
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/bht-test_internal_domain.ClockInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/bht-test_internal_domain.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/bht-test_internal_domain.Schedule'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bht-test_internal_domain.ErrorResponse'
+      summary: Clock in (start visit)
+      tags:
+      - schedules
+  /schedules/{id}/clock-out:
+    post:
+      consumes:
+      - application/json
+      description: End a visit by recording timestamp and geolocation. Schedule must
+        be in 'in_progress' status.
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Geolocation coordinates
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/bht-test_internal_domain.ClockOutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/bht-test_internal_domain.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/bht-test_internal_domain.Schedule'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bht-test_internal_domain.ErrorResponse'
+      summary: Clock out (end visit)
+      tags:
+      - schedules
+  /schedules/stats:
+    get:
+      description: Get dashboard statistics relative to user timezone
+      parameters:
+      - default: UTC
+        description: User timezone (e.g. Asia/Tokyo)
+        in: header
+        name: X-Timezone
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/bht-test_internal_domain.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/bht-test_internal_domain.ScheduleStats'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/bht-test_internal_domain.ErrorResponse'
+      summary: Get schedule statistics
+      tags:
+      - schedules
+  /schedules/today:
+    get:
+      description: Get all schedules for the current date relative to user timezone
+      parameters:
+      - default: UTC
+        description: User timezone (e.g. Asia/Tokyo)
+        in: header
+        name: X-Timezone
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/bht-test_internal_domain.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/bht-test_internal_domain.Schedule'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/bht-test_internal_domain.ErrorResponse'
+      summary: Get today's schedules
+      tags:
+      - schedules
+  /tasks:
+    post:
+      consumes:
+      - application/json
+      description: Create a new care task associated with a specific schedule
+      parameters:
+      - description: Task details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/bht-test_internal_domain.CreateTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/bht-test_internal_domain.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/bht-test_internal_domain.Task'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bht-test_internal_domain.ErrorResponse'
+      summary: Add task to schedule
+      tags:
+      - tasks
+  /tasks/{taskId}/update:
+    post:
+      consumes:
+      - application/json
+      description: Mark a care activity as completed or not_completed. If not_completed,
+        a reason is required.
+      parameters:
+      - description: Task ID
+        in: path
+        name: taskId
+        required: true
+        type: integer
+      - description: Status and optional reason
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/bht-test_internal_domain.UpdateTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/bht-test_internal_domain.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/bht-test_internal_domain.Task'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/bht-test_internal_domain.ErrorResponse'
+      summary: Update task status
+      tags:
+      - tasks
+swagger: "2.0"

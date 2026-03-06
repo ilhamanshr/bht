@@ -1,0 +1,2 @@
+ALTER TABLE schedules ADD COLUMN clock_in_verified BOOLEAN DEFAULT TRUE;
+ALTER TABLE schedules ADD COLUMN clock_out_verified BOOLEAN DEFAULT TRUE;
